@@ -143,8 +143,6 @@ export default function Report() {
     }
   };
 
-  const currentAnalysis = analysis || defaultAnalysis;
-  
   if (isLoading) {
     return (
       <div className="min-h-screen bg-background py-8">
@@ -162,14 +160,16 @@ export default function Report() {
     );
   }
 
-  if (!idea) {
+  if (!idea || !analysis) {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4">
           <Card>
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-muted-foreground">Unable to load idea details</p>
+                <p className="text-muted-foreground">
+                  {!idea ? "Unable to load idea details" : "Analysis not available yet"}
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -177,6 +177,8 @@ export default function Report() {
       </div>
     );
   }
+
+  const currentAnalysis = analysis;
 
   return (
     <div className="min-h-screen bg-background py-8">
