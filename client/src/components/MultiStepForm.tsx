@@ -68,6 +68,25 @@ export default function MultiStepForm() {
   const currentFields = steps[step].fields;
   const isLastStep = step === steps.length - 1;
 
+  const handleNext = async () => {
+    try {
+      const currentStepFields = steps[step].fields;
+      const isValid = await form.trigger(currentStepFields as any);
+
+      if (isValid) {
+        if (isLastStep) {
+          await form.handleSubmit(onSubmit)();
+        } else {
+          setStep(step + 1);
+        }
+      } else {
+        console.log('Form validation errors:', form.formState.errors);
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+    }
+  };
+
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardContent className="pt-6">
@@ -86,7 +105,7 @@ export default function MultiStepForm() {
         </div>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(isLastStep ? onSubmit : () => setStep(step + 1))}>
+          <form onSubmit={(e) => { e.preventDefault(); handleNext(); }}>
             {currentFields.includes('name') && (
               <FormField
                 control={form.control}
