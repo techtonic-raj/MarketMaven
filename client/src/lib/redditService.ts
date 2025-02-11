@@ -1,21 +1,22 @@
 import { apiRequest } from './queryClient';
 
 export interface RedditSentiment {
+  summary: string;
   overallSentiment: {
     positive: number;
     neutral: number;
     negative: number;
   };
+  keyThemes: Array<{
+    theme: string;
+    frequency: number;
+    sentiment: number;
+  }>;
   topPosts: {
     title: string;
     url: string;
     sentiment: 'positive' | 'neutral' | 'negative';
     score: number;
-  }[];
-  keywords: {
-    text: string;
-    count: number;
-    sentiment: number;
   }[];
 }
 

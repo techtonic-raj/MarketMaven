@@ -48,6 +48,12 @@ interface DetailedAnalysis {
   };
 }
 
+interface RedditSentiment {
+  summary: string;
+  keyThemes?: Array<{ theme: string; frequency: number }>;
+}
+
+
 export default function Report() {
   const [, params] = useRoute('/report/:id');
   const id = params?.id ? parseInt(params.id) : 0;
@@ -67,7 +73,7 @@ export default function Report() {
     enabled: !!idea,
   });
 
-  const { data: sentimentData, isLoading: isSentimentLoading } = useQuery({
+  const { data: sentimentData, isLoading: isSentimentLoading } = useQuery<RedditSentiment>({
     queryKey: ['reddit-sentiment', idea?.name],
     queryFn: () => analyzeRedditSentiment(idea!.name, idea!.targetMarket.industry),
     enabled: !!idea,
@@ -107,13 +113,18 @@ export default function Report() {
     );
   }
 
-  if (!idea || !analysis) {
+  // Show error or loading state if data isn't ready
+  if (!idea || !analysis || !marketData || !sentimentData || !recommendations) {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4">
           <Card>
-            <CardContent className="p-6 text-center">
-              <p className="text-muted-foreground">Report not found</p>
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-muted-foreground">
+                  {isLoading ? "Loading analysis..." : "Unable to load report"}
+                </p>
+              </div>
             </CardContent>
           </Card>
         </div>
