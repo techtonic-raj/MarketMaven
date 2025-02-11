@@ -8,7 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import Report from "@/pages/Report";
 import NotFound from "@/pages/not-found";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 function Router() {
   return (
@@ -26,8 +26,10 @@ function App() {
   return (
     <ThemeProvider>
       <QueryClientProvider client={queryClient}>
-        <Router />
-        <Toaster />
+        <TooltipProvider>
+          <Router />
+          <Toaster />
+        </TooltipProvider>
       </QueryClientProvider>
     </ThemeProvider>
   );
