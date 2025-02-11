@@ -14,6 +14,40 @@ import type { StartupIdea } from '@shared/schema';
 import { Download, HelpCircle, Star, TrendingUp, Users, BarChart2, FileText } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 
+// Define interfaces for the analysis data
+interface DetailedAnalysis {
+  executiveSummary: {
+    overview: string;
+    keyFindings: string[];
+    recommendations: string[];
+    viabilityScore: number;
+  };
+  marketAnalysis: {
+    marketSize: string;
+    growthPotential: string;
+    targetDemographics: {
+      segments: string[];
+      description: string;
+    };
+    industryTrends: string[];
+  };
+  competitorAnalysis: {
+    directCompetitors: Array<{
+      name: string;
+      strengths: string[];
+      weaknesses: string[];
+    }>;
+    marketGaps: string[];
+    opportunities: string[];
+  };
+  swotAnalysis: {
+    strengths: string[];
+    weaknesses: string[];
+    opportunities: string[];
+    threats: string[];
+  };
+}
+
 export default function Report() {
   const [, params] = useRoute('/report/:id');
   const id = params?.id ? parseInt(params.id) : 0;
@@ -22,7 +56,7 @@ export default function Report() {
     queryKey: [`/api/startup-ideas/${id}`],
   });
 
-  const { data: analysis, isLoading: isAnalysisLoading } = useQuery({
+  const { data: analysis, isLoading: isAnalysisLoading } = useQuery<DetailedAnalysis>({
     queryKey: [`/api/startup-ideas/${id}/analysis`],
     enabled: !!idea,
   });
@@ -39,7 +73,12 @@ export default function Report() {
     enabled: !!idea,
   });
 
-  const { data: recommendations, isLoading: isRecommendationsLoading } = useQuery({
+  const { data: recommendations, isLoading: isRecommendationsLoading } = useQuery<{
+    features: string[];
+    improvements: string[];
+    marketingStrategies: string[];
+    timeline: Array<{ phase: string; duration: string; activities: string[] }>;
+  }>({
     queryKey: [`/api/startup-ideas/${id}/recommendations`],
     enabled: !!idea,
   });
@@ -68,7 +107,7 @@ export default function Report() {
     );
   }
 
-  if (!idea) {
+  if (!idea || !analysis) {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4">
@@ -91,7 +130,7 @@ export default function Report() {
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" />
               <span className="font-medium">
-                Viability Score: {analysis?.executiveSummary.viabilityScore}/100
+                Viability Score: {analysis.executiveSummary.viabilityScore}/100
               </span>
             </div>
           </div>
@@ -108,11 +147,11 @@ export default function Report() {
               <CardTitle>Executive Summary</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <p className="text-muted-foreground">{analysis?.executiveSummary.overview}</p>
+              <p className="text-muted-foreground">{analysis.executiveSummary.overview}</p>
               <div className="mt-4">
                 <h3 className="font-medium mb-2">Key Findings</h3>
                 <ul className="list-disc list-inside space-y-1">
-                  {analysis?.executiveSummary.keyFindings.map((finding, index) => (
+                  {analysis.executiveSummary.keyFindings.map((finding, index) => (
                     <li key={index} className="text-muted-foreground">{finding}</li>
                   ))}
                 </ul>
@@ -141,17 +180,17 @@ export default function Report() {
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <h4 className="font-medium mb-1">Market Size</h4>
-                  <p className="text-2xl font-bold">{analysis?.marketAnalysis.marketSize}</p>
+                  <p className="text-2xl font-bold">{analysis.marketAnalysis.marketSize}</p>
                 </div>
                 <div>
                   <h4 className="font-medium mb-1">Growth Potential</h4>
-                  <p className="text-2xl font-bold">{analysis?.marketAnalysis.growthPotential}</p>
+                  <p className="text-2xl font-bold">{analysis.marketAnalysis.growthPotential}</p>
                 </div>
               </div>
               <div className="mb-6">
                 <h4 className="font-medium mb-2">Industry Trends</h4>
                 <ul className="list-disc list-inside space-y-1">
-                  {analysis?.marketAnalysis.industryTrends.map((trend, index) => (
+                  {analysis.marketAnalysis.industryTrends.map((trend, index) => (
                     <li key={index} className="text-muted-foreground">{trend}</li>
                   ))}
                 </ul>
@@ -179,7 +218,7 @@ export default function Report() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {analysis?.competitorAnalysis.directCompetitors.map((competitor, index) => (
+                {analysis.competitorAnalysis.directCompetitors.map((competitor, index) => (
                   <div key={index} className="border-b pb-4 last:border-0">
                     <h4 className="font-medium mb-2">{competitor.name}</h4>
                     <div className="grid md:grid-cols-2 gap-4">
@@ -217,7 +256,7 @@ export default function Report() {
                 <div>
                   <h4 className="font-medium mb-2 text-green-600">Strengths</h4>
                   <ul className="list-disc list-inside space-y-1">
-                    {analysis?.swotAnalysis.strengths.map((item, index) => (
+                    {analysis.swotAnalysis.strengths.map((item, index) => (
                       <li key={index} className="text-muted-foreground">{item}</li>
                     ))}
                   </ul>
@@ -225,7 +264,7 @@ export default function Report() {
                 <div>
                   <h4 className="font-medium mb-2 text-red-600">Weaknesses</h4>
                   <ul className="list-disc list-inside space-y-1">
-                    {analysis?.swotAnalysis.weaknesses.map((item, index) => (
+                    {analysis.swotAnalysis.weaknesses.map((item, index) => (
                       <li key={index} className="text-muted-foreground">{item}</li>
                     ))}
                   </ul>
@@ -233,7 +272,7 @@ export default function Report() {
                 <div>
                   <h4 className="font-medium mb-2 text-blue-600">Opportunities</h4>
                   <ul className="list-disc list-inside space-y-1">
-                    {analysis?.swotAnalysis.opportunities.map((item, index) => (
+                    {analysis.swotAnalysis.opportunities.map((item, index) => (
                       <li key={index} className="text-muted-foreground">{item}</li>
                     ))}
                   </ul>
@@ -241,7 +280,7 @@ export default function Report() {
                 <div>
                   <h4 className="font-medium mb-2 text-yellow-600">Threats</h4>
                   <ul className="list-disc list-inside space-y-1">
-                    {analysis?.swotAnalysis.threats.map((item, index) => (
+                    {analysis.swotAnalysis.threats.map((item, index) => (
                       <li key={index} className="text-muted-foreground">{item}</li>
                     ))}
                   </ul>
@@ -268,88 +307,96 @@ export default function Report() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="mb-6">
-                <p className="text-muted-foreground">{sentimentData?.summary}</p>
-              </div>
-              <SentimentChart data={sentimentData} />
-              <div className="mt-6">
-                <h4 className="font-medium mb-2">Key Themes</h4>
-                <div className="space-y-2">
-                  {sentimentData?.keyThemes.map((theme, index) => (
-                    <div key={index} className="flex items-center justify-between">
-                      <span>{theme.theme}</span>
-                      <span className="text-sm text-muted-foreground">
-                        Mentions: {theme.frequency}
-                      </span>
+              {sentimentData && (
+                <>
+                  <div className="mb-6">
+                    <p className="text-muted-foreground">{sentimentData.summary}</p>
+                  </div>
+                  <SentimentChart data={sentimentData} />
+                  <div className="mt-6">
+                    <h4 className="font-medium mb-2">Key Themes</h4>
+                    <div className="space-y-2">
+                      {sentimentData.keyThemes?.map((theme, index) => (
+                        <div key={index} className="flex items-center justify-between">
+                          <span>{theme.theme}</span>
+                          <span className="text-sm text-muted-foreground">
+                            Mentions: {theme.frequency}
+                          </span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                </>
+              )}
             </CardContent>
           </Card>
 
           {/* Recommendations */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Strategic Recommendations</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                <div>
-                  <h4 className="font-medium mb-2">Recommended Features</h4>
-                  <ul className="list-disc list-inside space-y-1">
-                    {recommendations?.features.map((feature, index) => (
-                      <li key={index} className="text-muted-foreground">{feature}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Suggested Improvements</h4>
-                  <ul className="list-disc list-inside space-y-1">
-                    {recommendations?.improvements.map((improvement, index) => (
-                      <li key={index} className="text-muted-foreground">{improvement}</li>
-                    ))}
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-medium mb-2">Marketing Strategies</h4>
-                  <ul className="list-disc list-inside space-y-1">
-                    {recommendations?.marketingStrategies.map((strategy, index) => (
-                      <li key={index} className="text-muted-foreground">{strategy}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Implementation Timeline */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Implementation Timeline</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-6">
-                {recommendations?.timeline.map((phase, index) => (
-                  <div key={index} className="border-l-2 border-primary pl-4">
-                    <h4 className="font-medium">
-                      Phase {index + 1}: {phase.phase}
-                    </h4>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Duration: {phase.duration}
-                    </p>
-                    <ul className="list-disc list-inside space-y-1">
-                      {phase.activities.map((activity, idx) => (
-                        <li key={idx} className="text-sm text-muted-foreground">
-                          {activity}
-                        </li>
-                      ))}
-                    </ul>
+          {recommendations && (
+            <>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Strategic Recommendations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-medium mb-2">Recommended Features</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {recommendations.features.map((feature, index) => (
+                          <li key={index} className="text-muted-foreground">{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Suggested Improvements</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {recommendations.improvements.map((improvement, index) => (
+                          <li key={index} className="text-muted-foreground">{improvement}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <h4 className="font-medium mb-2">Marketing Strategies</h4>
+                      <ul className="list-disc list-inside space-y-1">
+                        {recommendations.marketingStrategies.map((strategy, index) => (
+                          <li key={index} className="text-muted-foreground">{strategy}</li>
+                        ))}
+                      </ul>
+                    </div>
                   </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                </CardContent>
+              </Card>
+
+              {/* Implementation Timeline */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Implementation Timeline</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {recommendations.timeline.map((phase, index) => (
+                      <div key={index} className="border-l-2 border-primary pl-4">
+                        <h4 className="font-medium">
+                          Phase {index + 1}: {phase.phase}
+                        </h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          Duration: {phase.duration}
+                        </p>
+                        <ul className="list-disc list-inside space-y-1">
+                          {phase.activities.map((activity, idx) => (
+                            <li key={idx} className="text-sm text-muted-foreground">
+                              {activity}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
       </div>
     </div>
