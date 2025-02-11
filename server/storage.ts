@@ -1,4 +1,6 @@
 import { startupIdeas, type StartupIdea, type InsertStartupIdea } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
 
 export interface IStorage {
   createStartupIdea(idea: InsertStartupIdea): Promise<StartupIdea>;
@@ -7,43 +9,35 @@ export interface IStorage {
   updateStartupIdeaStatus(id: number, status: string): Promise<StartupIdea | undefined>;
 }
 
-export class MemStorage implements IStorage {
-  private ideas: Map<number, StartupIdea>;
-  private currentId: number;
-
-  constructor() {
-    this.ideas = new Map();
-    this.currentId = 1;
-  }
-
+export class DatabaseStorage implements IStorage {
   async createStartupIdea(idea: InsertStartupIdea): Promise<StartupIdea> {
-    const id = this.currentId++;
-    const newIdea: StartupIdea = {
-      ...idea,
-      id,
-      status: "pending",
-      submittedAt: new Date(),
-    };
-    this.ideas.set(id, newIdea);
+    const [newIdea] = await db
+      .insert(startupIdeas)
+      .values(idea)
+      .returning();
     return newIdea;
   }
 
   async getStartupIdea(id: number): Promise<StartupIdea | undefined> {
-    return this.ideas.get(id);
+    const [idea] = await db
+      .select()
+      .from(startupIdeas)
+      .where(eq(startupIdeas.id, id));
+    return idea;
   }
 
   async getAllStartupIdeas(): Promise<StartupIdea[]> {
-    return Array.from(this.ideas.values());
+    return await db.select().from(startupIdeas);
   }
 
   async updateStartupIdeaStatus(id: number, status: string): Promise<StartupIdea | undefined> {
-    const idea = this.ideas.get(id);
-    if (!idea) return undefined;
-    
-    const updatedIdea = { ...idea, status };
-    this.ideas.set(id, updatedIdea);
+    const [updatedIdea] = await db
+      .update(startupIdeas)
+      .set({ status })
+      .where(eq(startupIdeas.id, id))
+      .returning();
     return updatedIdea;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
