@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { apiRequest } from '@/lib/queryClient';
-import { useLocation } from 'wouter';
+import { useLocation, Link } from 'wouter';
 
 const steps = [
   { title: 'Idea Overview', fields: ['name', 'description', 'valueProposition'] },
@@ -22,7 +22,7 @@ export default function MultiStepForm() {
   const [step, setStep] = useState(0);
   const [, navigate] = useLocation();
   const { toast } = useToast();
-  
+
   const form = useForm<InsertStartupIdea>({
     resolver: zodResolver(insertStartupIdeaSchema),
     defaultValues: {
@@ -45,7 +45,19 @@ export default function MultiStepForm() {
       const idea = await response.json();
       toast({
         title: 'Success!',
-        description: 'Your startup idea has been submitted.',
+        description: (
+          <div className="space-y-2">
+            <p>Your startup idea has been submitted successfully.</p>
+            <div className="flex gap-2 mt-2">
+              <Button variant="outline" size="sm" asChild>
+                <Link href="/dashboard">View All Ideas</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href={`/report/${idea.id}`}>View Report</Link>
+              </Button>
+            </div>
+          </div>
+        ),
       });
       navigate(`/report/${idea.id}`);
     } catch (error) {
@@ -181,7 +193,7 @@ export default function MultiStepForm() {
                     <FormControl>
                       <Input
                         {...field}
-                        value={field.value.join(', ')}
+                        value={field.value?.join(', ') || ''}
                         onChange={(e) =>
                           field.onChange(e.target.value.split(',').map((s) => s.trim()))
                         }
@@ -203,7 +215,7 @@ export default function MultiStepForm() {
                     <FormControl>
                       <Input
                         {...field}
-                        value={field.value.join(', ')}
+                        value={field.value?.join(', ') || ''}
                         onChange={(e) =>
                           field.onChange(e.target.value.split(',').map((s) => s.trim()))
                         }
