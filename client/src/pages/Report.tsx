@@ -163,33 +163,20 @@ export default function Report() {
   }
 
   if (!idea) {
-    executiveSummary: {
-      overview: "Analysis not available",
-      keyFindings: [],
-      recommendations: [],
-      viabilityScore: 0
-    },
-    marketAnalysis: {
-      marketSize: "N/A",
-      growthPotential: "N/A",
-      targetDemographics: {
-        segments: [],
-        description: ""
-      },
-      industryTrends: []
-    },
-    competitorAnalysis: {
-      directCompetitors: [],
-      marketGaps: [],
-      opportunities: []
-    },
-    swotAnalysis: {
-      strengths: [],
-      weaknesses: [],
-      opportunities: [],
-      threats: []
-    }
-  };
+    return (
+      <div className="min-h-screen bg-background py-8">
+        <div className="container mx-auto px-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="text-center">
+                <p className="text-muted-foreground">Unable to load idea details</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const currentAnalysis = analysis || defaultAnalysis;
 
