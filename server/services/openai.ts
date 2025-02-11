@@ -50,7 +50,7 @@ interface DetailedAnalysis {
 export async function generateDetailedAnalysis(idea: StartupIdea): Promise<DetailedAnalysis> {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
+      model: "gpt-4", // the newest OpenAI model is "gpt-4o" which was released May 13, 2024
       messages: [
         {
           role: "system",
@@ -89,7 +89,7 @@ export async function analyzeSentimentWithAI(posts: any[]): Promise<{
 }> {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
@@ -127,7 +127,7 @@ export async function generateRecommendations(
 }> {
   try {
     const completion = await openai.chat.completions.create({
-      model: "gpt-4o",
+      model: "gpt-4",
       messages: [
         {
           role: "system",
