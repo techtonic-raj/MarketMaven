@@ -132,16 +132,47 @@ export default function Report() {
     );
   }
 
+  const defaultAnalysis: DetailedAnalysis = {
+    executiveSummary: {
+      overview: "Analysis not available",
+      keyFindings: [],
+      recommendations: [],
+      viabilityScore: 0
+    },
+    marketAnalysis: {
+      marketSize: "N/A",
+      growthPotential: "N/A",
+      targetDemographics: {
+        segments: [],
+        description: ""
+      },
+      industryTrends: []
+    },
+    competitorAnalysis: {
+      directCompetitors: [],
+      marketGaps: [],
+      opportunities: []
+    },
+    swotAnalysis: {
+      strengths: [],
+      weaknesses: [],
+      opportunities: [],
+      threats: []
+    }
+  };
+
+  const currentAnalysis = analysis || defaultAnalysis;
+
   return (
     <div className="min-h-screen bg-background py-8">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold mb-2">{idea.name}</h1>
+            <h1 className="text-3xl font-bold mb-2">{idea?.name || "Loading..."}</h1>
             <div className="flex items-center gap-2">
               <Star className="h-5 w-5 text-yellow-500" />
               <span className="font-medium">
-                Viability Score: {analysis.executiveSummary.viabilityScore}/100
+                Viability Score: {currentAnalysis.executiveSummary.viabilityScore}/100
               </span>
             </div>
           </div>
