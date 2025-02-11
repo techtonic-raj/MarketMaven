@@ -114,16 +114,46 @@ export default function Report() {
   }
 
   // Show error or loading state if data isn't ready
-  if (!idea || !analysis || !marketData || !sentimentData || !recommendations) {
+  const defaultAnalysis: DetailedAnalysis = {
+    executiveSummary: {
+      overview: "Analysis not available",
+      keyFindings: [],
+      recommendations: [],
+      viabilityScore: 0
+    },
+    marketAnalysis: {
+      marketSize: "N/A",
+      growthPotential: "N/A",
+      targetDemographics: {
+        segments: [],
+        description: ""
+      },
+      industryTrends: []
+    },
+    competitorAnalysis: {
+      directCompetitors: [],
+      marketGaps: [],
+      opportunities: []
+    },
+    swotAnalysis: {
+      strengths: [],
+      weaknesses: [],
+      opportunities: [],
+      threats: []
+    }
+  };
+
+  const currentAnalysis = analysis || defaultAnalysis;
+  
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="container mx-auto px-4">
           <Card>
             <CardContent className="p-6">
               <div className="text-center">
-                <p className="text-muted-foreground">
-                  {isLoading ? "Loading analysis..." : "Unable to load report"}
-                </p>
+                <Progress value={loadingProgress} className="mb-4" />
+                <p className="text-muted-foreground">Loading analysis...</p>
               </div>
             </CardContent>
           </Card>
@@ -132,7 +162,7 @@ export default function Report() {
     );
   }
 
-  const defaultAnalysis: DetailedAnalysis = {
+  if (!idea) {
     executiveSummary: {
       overview: "Analysis not available",
       keyFindings: [],
