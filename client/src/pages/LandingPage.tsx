@@ -2,6 +2,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { RocketIcon, TrendingUpIcon, UsersIcon, SearchIcon } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default function LandingPage() {
   return (
@@ -12,13 +13,14 @@ export default function LandingPage() {
             <RocketIcon className="h-6 w-6 text-primary" />
             <span className="text-xl font-bold">Market Validator</span>
           </div>
-          <div className="space-x-4">
+          <div className="flex items-center space-x-4">
             <Link href="/submit">
               <Button variant="ghost">Get Started</Button>
             </Link>
             <Link href="/dashboard">
               <Button variant="ghost">Dashboard</Button>
             </Link>
+            <ThemeToggle />
           </div>
         </div>
       </nav>

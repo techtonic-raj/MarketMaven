@@ -7,29 +7,22 @@ export const startupIdeas = pgTable("startup_ideas", {
   name: text("name").notNull(),
   description: text("description").notNull(),
   valueProposition: text("value_proposition").notNull(),
-  targetMarket: json("target_market").notNull(),
-  competitors: json("competitors").notNull(),
+  targetMarket: json("target_market").$type<{ industry: string }>().notNull(),
+  competitors: json("competitors").$type<Array<string>>().notNull().default([]),
   keywords: text("keywords").array().notNull(),
   status: text("status").notNull().default("pending"),
   submittedAt: timestamp("submitted_at").notNull().defaultNow(),
 });
 
 export const insertStartupIdeaSchema = createInsertSchema(startupIdeas)
-  .omit({ id: true, status: true, submittedAt: true });
-
-export const targetMarketSchema = z.object({
-  demographics: z.string(),
-  marketSize: z.string(),
-  industry: z.string(),
-});
-
-export const competitorSchema = z.object({
-  name: z.string(),
-  strengths: z.array(z.string()),
-  weaknesses: z.array(z.string()),
-});
+  .omit({ id: true, status: true, submittedAt: true, competitors: true })
+  .extend({
+    targetMarket: z.object({
+      industry: z.string().min(1, "Industry is required"),
+    }),
+  });
 
 export type InsertStartupIdea = z.infer<typeof insertStartupIdeaSchema>;
 export type StartupIdea = typeof startupIdeas.$inferSelect;
-export type TargetMarket = z.infer<typeof targetMarketSchema>;
-export type Competitor = z.infer<typeof competitorSchema>;
+export type TargetMarket = { industry: string; }; // Updated type
+export type Competitor = Array<string>; // Updated type

@@ -14,7 +14,6 @@ import { useLocation, Link } from 'wouter';
 const steps = [
   { title: 'Idea Overview', fields: ['name', 'description', 'valueProposition'] },
   { title: 'Market Details', fields: ['targetMarket'] },
-  { title: 'Competition', fields: ['competitors'] },
   { title: 'Keywords', fields: ['keywords'] },
 ];
 
@@ -30,11 +29,8 @@ export default function MultiStepForm() {
       description: '',
       valueProposition: '',
       targetMarket: {
-        demographics: '',
-        marketSize: '',
         industry: '',
       },
-      competitors: [],
       keywords: [],
     },
   });
@@ -140,64 +136,14 @@ export default function MultiStepForm() {
             )}
 
             {currentFields.includes('targetMarket') && (
-              <>
-                <FormField
-                  control={form.control}
-                  name="targetMarket.demographics"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>Target Demographics</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="targetMarket.marketSize"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>Market Size</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="targetMarket.industry"
-                  render={({ field }) => (
-                    <FormItem className="mb-4">
-                      <FormLabel>Industry</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </>
-            )}
-
-            {currentFields.includes('competitors') && (
               <FormField
                 control={form.control}
-                name="competitors"
+                name="targetMarket.industry"
                 render={({ field }) => (
                   <FormItem className="mb-4">
-                    <FormLabel>Competitors (comma-separated)</FormLabel>
+                    <FormLabel>Industry</FormLabel>
                     <FormControl>
-                      <Input
-                        {...field}
-                        value={field.value?.join(', ') || ''}
-                        onChange={(e) =>
-                          field.onChange(e.target.value.split(',').map((s) => s.trim()))
-                        }
-                      />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

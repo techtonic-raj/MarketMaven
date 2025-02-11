@@ -2,6 +2,7 @@ import MultiStepForm from '@/components/MultiStepForm';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { RocketIcon } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function IdeaSubmission() {
   return (
@@ -14,13 +15,14 @@ export default function IdeaSubmission() {
               <span className="text-xl font-bold">Market Validator</span>
             </div>
           </Link>
-          <div className="space-x-4">
+          <div className="flex items-center space-x-4">
             <Link href="/">
               <Button variant="ghost">Home</Button>
             </Link>
             <Link href="/dashboard">
               <Button variant="ghost">Dashboard</Button>
             </Link>
+            <ThemeToggle />
           </div>
         </div>
       </nav>

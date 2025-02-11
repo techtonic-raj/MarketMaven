@@ -7,6 +7,8 @@ import IdeaSubmission from "@/pages/IdeaSubmission";
 import Dashboard from "@/pages/Dashboard";
 import Report from "@/pages/Report";
 import NotFound from "@/pages/not-found";
+import { ThemeProvider } from "@/providers/theme-provider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 function Router() {
   return (
@@ -22,10 +24,12 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={queryClient}>
+        <Router />
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
