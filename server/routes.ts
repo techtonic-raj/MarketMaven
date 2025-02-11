@@ -119,6 +119,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Update the Reddit analysis endpoint
   app.post("/api/reddit/analyze", async (req, res) => {
     try {
       const { idea, industry } = req.body as { idea: string; industry: string };
@@ -136,11 +137,52 @@ export function registerRoutes(app: Express): Server {
         }
       }
 
-      const analysis = await analyzePosts(allPosts);
-      res.json(analysis);
+      const aiAnalysis = await analyzeSentimentWithAI(allPosts);
+      res.json(aiAnalysis);
     } catch (error) {
       console.error('Reddit analysis error:', error);
       res.status(500).json({ error: "Failed to analyze Reddit sentiment" });
+    }
+  });
+
+  // Add a new endpoint for detailed analysis
+  app.get("/api/startup-ideas/:id/analysis", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const idea = await storage.getStartupIdea(id);
+
+      if (!idea) {
+        res.status(404).json({ error: "Startup idea not found" });
+        return;
+      }
+
+      const analysis = await generateDetailedAnalysis(idea);
+      res.json(analysis);
+    } catch (error) {
+      console.error('Analysis error:', error);
+      res.status(500).json({ error: "Failed to generate analysis" });
+    }
+  });
+
+  // Add a new endpoint for recommendations
+  app.get("/api/startup-ideas/:id/recommendations", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const idea = await storage.getStartupIdea(id);
+
+      if (!idea) {
+        res.status(404).json({ error: "Startup idea not found" });
+        return;
+      }
+
+      const marketData = await fetchMarketData(idea.targetMarket.industry);
+      const sentimentData = await analyzeRedditSentiment(idea.name, idea.targetMarket.industry);
+      const recommendations = await generateRecommendations(idea, marketData, sentimentData);
+
+      res.json(recommendations);
+    } catch (error) {
+      console.error('Recommendations error:', error);
+      res.status(500).json({ error: "Failed to generate recommendations" });
     }
   });
 
@@ -150,17 +192,17 @@ export function registerRoutes(app: Express): Server {
 
 function calculateGrowthRate(data: MarketDataResponse): string {
   // TODO: Implement actual growth rate calculation
-  return "12%"; 
+  return "12%";
 }
 
 async function getCompetitors(industry: string): Promise<CompetitorData[]> {
   // TODO: Implement actual competitor fetching
-  return []; 
+  return [];
 }
 
 function generateProjections(data: MarketDataResponse): Array<{ year: number; revenue: number }> {
   // TODO: Implement actual projections
-  return []; 
+  return [];
 }
 
 async function analyzePosts(posts: Submission[]): Promise<RedditAnalysis> {
@@ -173,5 +215,26 @@ async function analyzePosts(posts: Submission[]): Promise<RedditAnalysis> {
     },
     topPosts: [],
     keywords: [],
-  }; 
+  };
+}
+
+// Placeholder functions -  Replace with actual AI-powered implementations
+async function analyzeSentimentWithAI(posts: Submission[]): Promise<RedditAnalysis> {
+    return { overallSentiment: { positive: 0, neutral: 0, negative: 0 }, topPosts: [], keywords: [] };
+}
+
+async function generateDetailedAnalysis(idea: any): Promise<any> {
+    return {};
+}
+
+async function fetchMarketData(industry: string): Promise<MarketAnalysis> {
+    return { marketSize: "Unknown", growthRate: "Unknown", competitors: [], revenueProjections: [] };
+}
+
+async function analyzeRedditSentiment(idea: string, industry: string): Promise<RedditAnalysis> {
+    return { overallSentiment: { positive: 0, neutral: 0, negative: 0 }, topPosts: [], keywords: [] };
+}
+
+async function generateRecommendations(idea: any, marketData: MarketAnalysis, sentimentData: RedditAnalysis): Promise<any> {
+    return [];
 }
